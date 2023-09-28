@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
     this.pdfMake.vfs = pdfFonts.pdfMake.vfs;
   }
 
-    ngOnInit(): void {
+  ngOnInit(): void {
     // Set up initial state
     this.addItem(); // Add one item initially
   }
@@ -60,22 +60,38 @@ export class AppComponent implements OnInit {
     return item.priceUnit * item.quantity;
   }
 
-
   generatePDF() {
     // console.log(this.invoiceForm.value);
     // if (this.invoiceForm.value.valid) {
-    const 
-    { business_name , address, phone_number, email, invoice_number, invoice_date, due_date } =
-      this.invoiceForm.value ;
+    const {
+      business_name,
+      address,
+      phone_number,
+      email,
+      invoice_number,
+      invoice_date,
+      due_date,
+      taxRate, // Add a field for tax rate in your form
+      fees, // Add a field for fees in your form
+      discounts, // Add a field for discounts in your form
+    } = this.invoiceForm.value;
 
-  // Create an array to store the item data for the PDF table
-  const itemData = this.items.map((item: any, index: number) => [
-    `Item ${index + 1}`, // Item number (1-based index)
-    item.quantity,
-    `$${item.priceUnit.toFixed(2)}`, // Add USD sign and format unit price
-    `$${(item.quantity * item.priceUnit).toFixed(2)}`, // Add USD sign and format amount
-  ],);
+    // Calculate Subtotal
+    const subtotal = this.items.reduce((acc, item) => acc + item.amount, 0);
 
+    // Calculate Tax Amount
+    const taxAmount = subtotal * (taxRate / 100);
+
+    // Calculate Total Amount (including fees and discounts)
+    const totalAmount = subtotal + taxAmount + fees - discounts;
+
+    // Create an array to store the item data for the PDF table
+    const itemData = this.items.map((item: any, index: number) => [
+      `Item ${index + 1}`, // Item number (1-based index)
+      item.quantity,
+      `$${item.priceUnit.toFixed(2)}`, // Add USD sign and format unit price
+      `$${(item.quantity * item.priceUnit).toFixed(2)}`, // Add USD sign and format amount
+    ]);
 
     // Define the table structure
     const table = {
@@ -113,7 +129,23 @@ export class AppComponent implements OnInit {
         { text: `Invoice Number: ${invoice_number}`, style: 'subheader' },
         { text: `Invoice Date: ${invoice_date}`, style: 'subheader' },
         { text: `Payment due: ${due_date}`, style: 'subheader' },
-        { text: 'Items:', style: 'subheader' }, table,
+        { text: 'Items:', style: 'subheader' },
+        table,
+        // Add Subtotal
+        { text: `Subtotal: $${0}`, style: 'normal' },
+
+        // Add Tax
+        { text: `Tax (${0}%): $${0}`, style: 'normal' },
+
+        // Add Fees
+        { text: `Fees: $${0}`, style: 'normal' },
+
+        // Add Discounts
+        { text: `Discounts: $${0}`, style: 'normal' },
+
+        // Add Total Amount
+        { text: `Total Amount: $${0}`, style: 'normal' },
+
         { text: `Terms and conditions`, style: 'normal' },
         { text: `Terms and conditions go here`, style: 'signOff' },
       ],
@@ -129,7 +161,7 @@ export class AppComponent implements OnInit {
           bold: true,
           margin: [0, 10, 0, 5],
         },
-        normal:{
+        normal: {
           fontSize: 13,
           bold: false,
           margin: [0, 10, 0, 5],
@@ -148,8 +180,8 @@ export class AppComponent implements OnInit {
     };
 
     this.pdfMake.createPdf(docDefinition).open(); // Opens the PDF in a new tab
-      // } else {
-      //   // Handle invalid form data, show error messages, etc.
-      // }
+    // } else {
+    //   // Handle invalid form data, show error messages, etc.
+    // }
   }
 }
