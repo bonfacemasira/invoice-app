@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -8,12 +8,15 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'invoice-app';
 
   invoiceForm: any;
   pdfMake: any;
   pdfFonts: any;
+
+  // Define an array to store items
+  items: any[] = [];
 
   constructor(private formBuilder: FormBuilder) {
     this.invoiceForm = this.formBuilder.group({
@@ -33,13 +36,65 @@ export class AppComponent {
     this.pdfMake.vfs = pdfFonts.pdfMake.vfs;
   }
 
+    ngOnInit(): void {
+    // Set up initial state
+    this.addItem(); // Add one item initially
+  }
+
+  // Add a new item to the items array
+  addItem(): void {
+    this.items.push({
+      priceUnit: 0, // You can set an initial value if needed
+      quantity: 1, // You can set an initial value if needed
+      amount: 0, // Initialize amount property
+    });
+  }
+
+  // Remove an item from the items array
+  removeItem(index: number): void {
+    this.items.splice(index, 1);
+  }
+
+  // Calculate the amount for an item
+  calculateAmount(item: any): number {
+    return item.priceUnit * item.quantity;
+  }
+
+
   generatePDF() {
     // console.log(this.invoiceForm.value);
     // if (this.invoiceForm.value.valid) {
     const 
     { business_name , address, phone_number, email, invoice_number, invoice_date, due_date } =
       this.invoiceForm.value ;
-    // console.log("Bonface ", this.invoiceForm.value.address);
+
+  // Create an array to store the item data for the PDF table
+  const itemData = this.items.map((item: any, index: number) => [
+    index + 1, // Item number (1-based index)
+    item.quantity,
+    item.priceUnit,
+    item.quantity * item.priceUnit, // Calculate the total amount for the item
+  ]);
+
+
+    // Define the table structure
+    const table = {
+      table: {
+        widths: ['*', 80, 80, 80], // Adjust column widths as needed
+        headerRows: 1,
+        body: [
+          // Table header row
+          [
+            'Item', // Add a header for item numbers
+            'Quantity',
+            'Unit Price',
+            'Amount',
+          ],
+          ...itemData, // Add item data rows
+        ],
+      },
+    };
+
     // Convert form data into PDF format using pdfMake
     const docDefinition = {
       content: [
@@ -58,7 +113,7 @@ export class AppComponent {
         { text: `Invoice Number: ${invoice_number}`, style: 'subheader' },
         { text: `Invoice Date: ${invoice_date}`, style: 'subheader' },
         { text: `Payment due: ${due_date}`, style: 'subheader' },
-        { text: 'Items:', style: 'subheader' },
+        { text: 'Items:', style: 'subheader' }, table,
         // {
         //   ul: items.map((item: any) => {
         //     return `${item.description} - Quantity: ${item.quantity}, Unit Price: $${item.unitPrice}`;

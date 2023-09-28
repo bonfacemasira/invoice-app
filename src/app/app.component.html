@@ -120,6 +120,50 @@
       >Payment Due Date</label
     >
   </div>
+
+
+  <button type="button" (click)="addItem()" class="text-blue-700 hover:text-blue-800 focus:outline-none">
+  <i class="fas fa-plus"></i> Add Item
+</button>
+
+<!-- Display added items dynamically -->
+<div *ngFor="let item of items; let i = index" class="item-container">
+  <!-- Price Unit -->
+  <input
+    type="number"
+    [(ngModel)]="items[i].priceUnit"
+    name="priceUnit{{ i }}"
+    class="item-input"
+    placeholder="Price Unit"
+    required
+  />
+
+  <!-- Quantity -->
+  <input
+    type="number"
+    [(ngModel)]="items[i].quantity"
+    name="quantity{{ i }}"
+    class="item-input"
+    placeholder="Quantity"
+    required
+  />
+
+  <!-- Calculate and display Amount -->
+  <input
+    type="text"
+    [value]="items[i].priceUnit * items[i].quantity"
+    class="item-input"
+    readonly
+  />
+
+  <!-- Remove item button -->
+  <button type="button" (click)="removeItem(i)" class="text-red-700 hover:text-red-800 focus:outline-none">
+    <i class="fas fa-times"></i> Remove
+  </button>
+</div>
+
+
+
   <button
     type="button"
     (click)="generatePDF()"
