@@ -1,4 +1,18 @@
-<form [formGroup]="invoiceForm">
+<div class="container px-6 py-12 mx-auto space-y-20 max-w-screen-2xl">
+
+  <div class="container px-4 mx-auto md:flex md:items-center justify-center h-full">
+    <div class="flex justify-between items-center">
+      <a href="#" class="font-bold text-xl text-indigo-600">Invoice App</a>
+      <button class="border border-solid border-gray-600 px-3 py-1 rounded text-gray-600 opacity-50 hover:opacity-75 md:hidden" id="navbar-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </div>
+  
+
+
+
+  <form [formGroup]="invoiceForm">
   Bill to:
   <div class="relative z-0 w-full mb-6 group">
     <input
@@ -37,6 +51,7 @@
   <div class="relative z-0 w-full mb-6 group">
     <input
       type="tel"
+      pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
       formControlName="phone_number"
       name="phone_number"
       id="phone_number"
@@ -172,3 +187,4 @@
     Generate PDF
   </button>
 </form>
+</div>
