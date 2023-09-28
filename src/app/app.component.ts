@@ -70,11 +70,11 @@ export class AppComponent implements OnInit {
 
   // Create an array to store the item data for the PDF table
   const itemData = this.items.map((item: any, index: number) => [
-    index + 1, // Item number (1-based index)
+    `Item ${index + 1}`, // Item number (1-based index)
     item.quantity,
-    item.priceUnit,
-    item.quantity * item.priceUnit, // Calculate the total amount for the item
-  ]);
+    `$${item.priceUnit.toFixed(2)}`, // Add USD sign and format unit price
+    `$${(item.quantity * item.priceUnit).toFixed(2)}`, // Add USD sign and format amount
+  ],);
 
 
     // Define the table structure
@@ -85,10 +85,10 @@ export class AppComponent implements OnInit {
         body: [
           // Table header row
           [
-            'Item', // Add a header for item numbers
-            'Quantity',
-            'Unit Price',
-            'Amount',
+            { text: 'Item', style: 'tableHeader' }, // Add a header for item numbers
+            { text: 'Quantity', style: 'tableHeader' },
+            { text: 'Price Unit', style: 'tableHeader' },
+            { text: 'Amount', style: 'tableHeader' },
           ],
           ...itemData, // Add item data rows
         ],
@@ -114,12 +114,6 @@ export class AppComponent implements OnInit {
         { text: `Invoice Date: ${invoice_date}`, style: 'subheader' },
         { text: `Payment due: ${due_date}`, style: 'subheader' },
         { text: 'Items:', style: 'subheader' }, table,
-        // {
-        //   ul: items.map((item: any) => {
-        //     return `${item.description} - Quantity: ${item.quantity}, Unit Price: $${item.unitPrice}`;
-        //   }),
-        // },
-        // { text: `Total Amount: $${totalAmount}`, style: 'subheader' },
         { text: `Terms and conditions`, style: 'normal' },
         { text: `Terms and conditions go here`, style: 'signOff' },
       ],
@@ -145,7 +139,11 @@ export class AppComponent implements OnInit {
           bold: false,
           italics: true,
           margin: [0, 10, 0, 5],
-        }
+        },
+        tableHeader: {
+          bold: true, // Make text bold
+          fillColor: 'orange', // Set the background color to orange
+        },
       },
     };
 
