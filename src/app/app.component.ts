@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 
@@ -77,7 +77,9 @@ export class AppComponent implements OnInit {
     } = this.invoiceForm.value;
 
     // Calculate Subtotal
-    const subtotal = this.items.reduce((acc, item) => acc + item.amount, 0);
+    // const subtotal = this.items.reduce((acc, item) => acc + item.amount, 0);
+    const subtotal = this.items.reduce((acc, item) => acc + this.calculateAmount(item), 0);
+
 
     // Calculate Tax Amount
     const taxAmount = subtotal * (taxRate / 100);
@@ -132,19 +134,16 @@ export class AppComponent implements OnInit {
         { text: 'Items:', style: 'subheader' },
         table,
         // Add Subtotal
-        { text: `Subtotal: $${0}`, style: 'normal' },
+        { text: `Subtotal $${0}`, style: 'normal' },
 
         // Add Tax
-        { text: `Tax (${0}%): $${0}`, style: 'normal' },
+        { text: `Tax $0.00% $${0}`, style: 'normal' },
 
         // Add Fees
-        { text: `Fees: $${0}`, style: 'normal' },
-
-        // Add Discounts
-        { text: `Discounts: $${0}`, style: 'normal' },
+        { text: `Fees/Discounts $${0}`, style: 'normal' },
 
         // Add Total Amount
-        { text: `Total Amount: $${0}`, style: 'normal' },
+        { text: `TOTAL $${0}`, style: 'normal' },
 
         { text: `Terms and conditions`, style: 'normal' },
         { text: `Terms and conditions go here`, style: 'signOff' },
